@@ -23,13 +23,24 @@ public class PersonService : IPersonService
         return persons.Select(p => p.ToDto()).ToList();
     }
 
-    public Task<List<PersonReadDto>?> GetPeopleByColorAsync(string color, CancellationToken token)
+    public async Task<List<PersonReadDto>?> GetPeopleByColorAsync(string color, CancellationToken token)
     {
-        throw new NotImplementedException();
+        if (!Enum.TryParse<Color>(color, out var colorVal))
+        {
+            _logger.LogInformation("Farbe {color} ist unbekannt.", color);
+            
+            throw new Exception(color);
+        }
+
+        var persons = await _repo.GetPeopleByColorAsync((int)colorVal, token);
+
+        return persons.Select(p => p.ToDto()).ToList();
     }
 
-    public Task<PersonReadDto?> GetPersonByIdAsync(int Id, CancellationToken token)
+    public async Task<PersonReadDto?> GetPersonByIdAsync(int Id, CancellationToken token)
     {
-        throw new NotImplementedException();
+        var person = await _repo.GetPersonByIdAsync(Id, token);
+
+        return person?.ToDto();
     }
 }
