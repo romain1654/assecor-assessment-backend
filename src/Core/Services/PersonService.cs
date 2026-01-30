@@ -26,7 +26,7 @@ public class PersonService : IPersonService
 
     public async Task<List<PersonReadDto>?> GetPeopleByColorAsync(string color, CancellationToken token)
     {
-        if (!Enum.TryParse<Color>(color, out var colorVal))
+        if (!Enum.TryParse<Color>(color.ToLower(), out var colorVal))
         {
             _logger.LogInformation("Farbe {color} ist unbekannt.", color);
             
