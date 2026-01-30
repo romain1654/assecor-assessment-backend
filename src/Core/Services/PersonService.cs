@@ -1,5 +1,6 @@
 using Core.Dtos;
 using Core.Enums;
+using Core.Exceptions;
 using Core.Interfaces;
 using Microsoft.Extensions.Logging;
 
@@ -29,7 +30,7 @@ public class PersonService : IPersonService
         {
             _logger.LogInformation("Farbe {color} ist unbekannt.", color);
             
-            throw new Exception(color);
+            throw new UnknownColorException(color);
         }
 
         var persons = await _repo.GetPeopleByColorAsync((int)colorVal, token);
