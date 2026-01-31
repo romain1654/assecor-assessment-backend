@@ -1,4 +1,4 @@
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
@@ -9,6 +9,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API", "src\API\API.csproj", "{CBAFC0F9-5B69-AE5B-776E-B650E010DF04}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "src\Infrastructure\Infrastructure.csproj", "{3D745DFE-AF9A-E111-755D-FD3FFF280728}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{6459C7D3-A130-4AD1-B35E-D522814F2A42}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API.Tests", "test\API.Tests\API.Tests.csproj", "{9D342520-ACC1-45AF-92F3-BFDE96E739A1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Tests", "test\Infrastructure.Tests\Infrastructure.Tests.csproj", "{9D2511D5-E596-43A8-A609-4FB034EA2975}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -28,6 +34,14 @@ Global
 		{3D745DFE-AF9A-E111-755D-FD3FFF280728}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3D745DFE-AF9A-E111-755D-FD3FFF280728}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3D745DFE-AF9A-E111-755D-FD3FFF280728}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9D342520-ACC1-45AF-92F3-BFDE96E739A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9D342520-ACC1-45AF-92F3-BFDE96E739A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9D342520-ACC1-45AF-92F3-BFDE96E739A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9D342520-ACC1-45AF-92F3-BFDE96E739A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9D2511D5-E596-43A8-A609-4FB034EA2975}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9D2511D5-E596-43A8-A609-4FB034EA2975}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9D2511D5-E596-43A8-A609-4FB034EA2975}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9D2511D5-E596-43A8-A609-4FB034EA2975}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -36,6 +50,8 @@ Global
 		{4114E4DC-A6BD-9F5D-EC82-1C3B16F50727} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{CBAFC0F9-5B69-AE5B-776E-B650E010DF04} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{3D745DFE-AF9A-E111-755D-FD3FFF280728} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{9D342520-ACC1-45AF-92F3-BFDE96E739A1} = {6459C7D3-A130-4AD1-B35E-D522814F2A42}
+		{9D2511D5-E596-43A8-A609-4FB034EA2975} = {6459C7D3-A130-4AD1-B35E-D522814F2A42}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4320D540-C2DE-411E-A035-0FE5B0B84369}
