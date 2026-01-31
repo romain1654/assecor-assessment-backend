@@ -9,6 +9,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+builder.Services.AddInfrastructure(builder.Configuration, builder.Environment.ContentRootPath);
+builder.Services.AddScoped<IPersonService, PersonService>();
+
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen();
