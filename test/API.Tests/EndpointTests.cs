@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Core.Dtos;
+using System.Net;
+using System.Net.Http.Json;
 
 namespace API.Tests;
 
@@ -38,4 +40,47 @@ public class EndpointTests : IClassFixture<WebApplicationFactory<Program>>
         new(3, "Romain", "Jean", "70190", "Stuttgart", "grün"),
         new(3, "Jonas", "Müller", "32323", "Hansstadt", "blau")
     };
+
+    #region GetAllPeopleAsync
+
+    [Fact]
+    public async Task GetAllPeopleAsync_WhenServiceReturnsList_ReturnsOkWithList()
+    {
+        var persons = GetPersons();
+                        
+        _svc.Setup(s => s.GetAllPeopleAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(persons);
+
+        var response = await _client.GetAsync("/persons");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var result = await response.Content.ReadFromJsonAsync<List<PersonReadDto>>();
+        Assert.NotNull(result);
+        Assert.Equal(3, result!.Count);
+        Assert.Contains(result, p => p.Name == "Hans");
+        Assert.Contains(result, p => p.City == "Stuttgart");   
+
+        _svc.Verify(s => s.GetAllPeopleAsync(It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetAllPeopleAsync_WhenNoPeople_ReturnsOkWithEmptyList()
+    {                        
+        _svc.Setup(s => s.GetAllPeopleAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<PersonReadDto>());
+
+        var response = await _client.GetAsync("/persons");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var result = await response.Content.ReadFromJsonAsync<List<PersonReadDto>>();
+        Assert.NotNull(result);
+        Assert.Empty(result);
+
+        _svc.Verify(s => s.GetAllPeopleAsync(It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    #endregion
+
 }
