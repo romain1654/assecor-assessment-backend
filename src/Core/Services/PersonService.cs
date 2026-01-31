@@ -23,7 +23,7 @@ public class PersonService : IPersonService
 
         if (!Enum.TryParse<Color>(personColor, out _))
         {
-            Console.WriteLine($"Unknown color: '{personColor}' ");
+            _logger.LogInformation("Farbe {color} ist unbekannt.", personColor);
             
             throw new UnknownColorException(personColor);
         }
