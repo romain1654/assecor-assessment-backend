@@ -1,6 +1,8 @@
 using Core.Interfaces;
 using Infrastructure.Data.Csv;
+using Infrastructure.Data.Ef;
 using Infrastructure.Options;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -10,7 +12,7 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration, 
         string contentRootPath)
-    {     
+    {         
         var dataSource = configuration.GetSection("DataSource").Get<DataSourceOptions>() ?? new DataSourceOptions();
 
         if (dataSource.Provider.Equals("Csv", StringComparison.OrdinalIgnoreCase))
@@ -29,6 +31,11 @@ public static class ServiceCollectionExtensions
 
             services.AddSingleton<PersonCsvReader>();
             services.AddScoped<IPersonRepository, CsvPersonRepository>();
+        }
+        else if (dataSource.Provider.Equals("Ef", StringComparison.OrdinalIgnoreCase))
+        {
+            services.AddDbContext<PersonDb>(options => options.UseSqlite(dataSource.Ef.ConnectionString));
+            services.AddScoped<IPersonRepository, EfPersonRepository>();
         }
         else
         {
