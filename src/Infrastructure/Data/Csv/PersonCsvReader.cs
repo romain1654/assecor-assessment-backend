@@ -35,6 +35,26 @@ public class PersonCsvReader
 
     private Person GetPersonFromSplitLine(string[] parts, int Id)
     {
-        return new Person();
+        var (zipCode, city) = SplitZipCity(parts[2]);
+
+        return new Person
+        {
+            Id = Id,
+            LastName = parts[0],
+            Name = parts[1],
+            ZipCode = zipCode,
+            City = city,
+            Color = int.Parse(parts[3])
+        };
+    }
+
+    private (string zip, string city) SplitZipCity(string part)
+    {
+        var spaceIndex = part.Trim().IndexOf(' ');
+
+        var zip = part.Substring(0, spaceIndex + 1).Trim();
+        var city = part.Substring(spaceIndex + 1).Trim();
+
+        return (zip, city);
     }
 }
