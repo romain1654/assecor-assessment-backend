@@ -51,7 +51,7 @@ public static class PersonEndpoints
 
                 return TypedResults.Created();
             }
-            
+
             catch (UnknownColorException ex)
             {
                 return TypedResults.BadRequest(new 
@@ -59,8 +59,16 @@ public static class PersonEndpoints
                     error = ex.Message 
                 });
             }
+
+            catch (NotSupportedException ex)
+            {
+                return Results.Problem( 
+                    detail: ex.Message,
+                    statusCode: StatusCodes.Status405MethodNotAllowed
+                );
+            }
         });    
-        
+
         return group;
     }
 }
