@@ -42,6 +42,14 @@ public class EndpointTests : IClassFixture<WebApplicationFactory<Program>>
         new(3, "Jonas", "Müller", "32323", "Hansstadt", "blau")
     };
 
+    private PersonCreateDto GetPersonCreateDto() => new PersonCreateDto(
+        Name: "Hans",
+        LastName: "Müller",
+        ZipCode: "67742",
+        City: "Lauterecken",
+        Color: "blau"
+    );
+
     #region GetAllPeopleAsync
 
     [Fact]
@@ -187,6 +195,50 @@ public class EndpointTests : IClassFixture<WebApplicationFactory<Program>>
         Assert.Contains($"Unbekannte Farbe '{color}'.", result.GetProperty("error").GetString());
 
         _svc.Verify(s => s.GetPeopleByColorAsync(color, It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    #endregion
+
+    #region CreatePersonAsync
+    
+    [Fact]
+    public async Task CreatePersonAsync_WhenServiceSucceeds_ReturnsCreated()
+    {
+        var dto = GetPersonCreateDto();
+
+        _svc.Setup(s => s.CreatePersonAsync(It.IsAny<PersonCreateDto>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
+        var response = await _client.PostAsJsonAsync("/persons", dto);
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
+        _svc.Verify(s => s.CreatePersonAsync(It.Is<PersonCreateDto>(p =>
+                p.Name == dto.Name &&
+                p.LastName == dto.LastName &&
+                p.ZipCode == dto.ZipCode &&
+                p.City == dto.City &&
+                p.Color == dto.Color),
+                It.IsAny<CancellationToken>()),Times.Once);
+    }
+
+    [Fact]
+    public async Task CreatePersonAsync_WhenServiceThrowsUnknownColor_ReturnsBadRequestWithError()
+    {
+        var color = "schwarz";
+        var dto = GetPersonCreateDto();
+
+        _svc.Setup(s => s.CreatePersonAsync(It.IsAny<PersonCreateDto>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new UnknownColorException(color));
+
+        var response = await _client.PostAsJsonAsync("/persons", dto);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        var result = await response.Content.ReadFromJsonAsync<System.Text.Json.JsonElement>();
+        Assert.Contains($"Unbekannte Farbe '{color}'.", result.GetProperty("error").GetString());
+
+        _svc.Verify(s => s.CreatePersonAsync(It.IsAny<PersonCreateDto>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     #endregion
