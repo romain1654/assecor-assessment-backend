@@ -83,4 +83,46 @@ public class EndpointTests : IClassFixture<WebApplicationFactory<Program>>
 
     #endregion
 
+    #region GetPersonByIdAsync
+
+    [Fact]
+    public async Task GetPersonByIdAsync_IdFound_ReturnsRelevantPerson()
+    {        
+        var persons = GetPersons();
+        var targetPerson = persons[1];
+        var id = targetPerson.Id;
+        
+        _svc.Setup(svc => svc.GetPersonByIdAsync(id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(targetPerson);
+
+        var response = await _client.GetAsync($"/persons/{id}");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var result = await response.Content.ReadFromJsonAsync<PersonReadDto>();
+        Assert.NotNull(result);
+        Assert.Equal(result.Id, id);
+        Assert.Equal(result.Name, targetPerson.Name);
+        Assert.Equal(result.ZipCode, targetPerson.ZipCode);
+
+        _svc.Verify(s => s.GetPersonByIdAsync(id, It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetPersonByIdAsync_IdNotExisting_ReturnsNotFound()
+    {        
+        var id = 2;   
+
+        _svc.Setup(svc => svc.GetPersonByIdAsync(id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((PersonReadDto?)null);
+
+        var response = await _client.GetAsync($"/persons/{id}");
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+
+        _svc.Verify(s => s.GetPersonByIdAsync(id, It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    #endregion
+
 }
