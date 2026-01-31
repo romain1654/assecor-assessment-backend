@@ -1,3 +1,4 @@
+using System.Text;
 using Core.Entities;
 
 namespace Infrastructure.Data.Csv;
@@ -56,5 +57,39 @@ public class PersonCsvReader
         var city = part.Substring(spaceIndex + 1).Trim();
 
         return (zip, city);
+    }
+
+    private string CleanNumberInput(string? input)
+    {
+        if (string.IsNullOrEmpty(input)) { return string.Empty; }
+
+        var cleanedInput = new StringBuilder(input.Length);
+
+        foreach (var c in input)
+        {
+            if (char.IsNumber(c) || c == ' ') 
+            { 
+                cleanedInput.Append(c); 
+            } 
+        }  
+
+        return cleanedInput.ToString().Trim();    
+    }
+
+    private string CleanStringInput(string? input)
+    {
+        if (string.IsNullOrEmpty(input)) { return string.Empty; }
+
+        var cleanedInput = new StringBuilder(input.Length);
+
+        foreach (var c in input)
+        {
+            if (char.IsLetter(c) || c == ' ') 
+            { 
+                cleanedInput.Append(c); 
+            } 
+        }
+
+        return cleanedInput.ToString().Trim();
     }
 }
