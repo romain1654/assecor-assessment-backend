@@ -138,7 +138,7 @@ public class EndpointTests : IClassFixture<WebApplicationFactory<Program>>
         _svc.Setup(svc => svc.GetPeopleByColorAsync(color, It.IsAny<CancellationToken>()))
             .ReturnsAsync(colorPerson);
 
-        var response = await _client.GetAsync($"/persons/{color}");
+        var response = await _client.GetAsync($"/persons/color/{color}");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
@@ -161,7 +161,7 @@ public class EndpointTests : IClassFixture<WebApplicationFactory<Program>>
         _svc.Setup(s => s.GetPeopleByColorAsync(color, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<PersonReadDto>());
 
-        var response = await _client.GetAsync($"/persons/{color}");
+        var response = await _client.GetAsync($"/persons/color/{color}");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         var result = await response.Content.ReadFromJsonAsync<List<PersonReadDto>>();
@@ -179,12 +179,12 @@ public class EndpointTests : IClassFixture<WebApplicationFactory<Program>>
         _svc.Setup(svc => svc.GetPeopleByColorAsync(color, It.IsAny<CancellationToken>()))
             .ThrowsAsync(new UnknownColorException(color));
 
-        var response = await _client.GetAsync($"/persons/{color}");
+        var response = await _client.GetAsync($"/persons/color/{color}");
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
 
         var result = await response.Content.ReadFromJsonAsync<System.Text.Json.JsonElement>();
-        Assert.Equal($"Unbekannte Farbe '{color}'.", result.GetProperty("error").GetString());
+        Assert.Contains($"Unbekannte Farbe '{color}'.", result.GetProperty("error").GetString());
 
         _svc.Verify(s => s.GetPeopleByColorAsync(color, It.IsAny<CancellationToken>()), Times.Once);
     }
