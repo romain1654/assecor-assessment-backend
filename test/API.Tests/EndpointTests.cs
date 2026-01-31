@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Core.Dtos;
 using System.Net;
 using System.Net.Http.Json;
+using Core.Exceptions;
 
 namespace API.Tests;
 
@@ -125,4 +126,68 @@ public class EndpointTests : IClassFixture<WebApplicationFactory<Program>>
 
     #endregion
 
+  #region GetPersonByColorAsync
+
+    [Fact]
+    public async Task GetPersonsByColor_ColorExistingAndPresent_ReturnsListOfPeople()
+    {        
+        var color = "blau";   
+        var allPersons = GetPersons();
+        var colorPerson = allPersons.Where(p => p.Color == color).ToList();
+
+        _svc.Setup(svc => svc.GetPeopleByColorAsync(color, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(colorPerson);
+
+        var response = await _client.GetAsync($"/persons/{color}");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var result = await response.Content.ReadFromJsonAsync<List<PersonReadDto>>();
+        Assert.NotNull(result);
+        Assert.Equal(colorPerson.Count, result!.Count);
+
+        Assert.Contains(result, p => p.Name == "Jonas");
+        Assert.Contains(result, p => p.City == "Lauterecken");
+        Assert.Contains(result, p => p.ZipCode == "32323");
+
+        _svc.Verify(s => s.GetPeopleByColorAsync(color, It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetPersonsByColor_WhenServiceReturnsEmptyList_ReturnsOkWithEmptyArray()
+    {
+        var color = "rot";
+
+        _svc.Setup(s => s.GetPeopleByColorAsync(color, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<PersonReadDto>());
+
+        var response = await _client.GetAsync($"/persons/{color}");
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var result = await response.Content.ReadFromJsonAsync<List<PersonReadDto>>();
+        Assert.NotNull(result);
+        Assert.Empty(result);
+
+        _svc.Verify(s => s.GetPeopleByColorAsync(color, It.IsAny<CancellationToken>()), Times.Once);
+    }
+    
+    [Fact]
+    public async Task GetPersonsByColor_ColorNotExisting_ReturnsExceptionError()
+    {        
+        var color = "schwarz";   
+
+        _svc.Setup(svc => svc.GetPeopleByColorAsync(color, It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new UnknownColorException(color));
+
+        var response = await _client.GetAsync($"/persons/{color}");
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        var result = await response.Content.ReadFromJsonAsync<System.Text.Json.JsonElement>();
+        Assert.Equal($"Unbekannte Farbe '{color}'.", result.GetProperty("error").GetString());
+
+        _svc.Verify(s => s.GetPeopleByColorAsync(color, It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    #endregion
 }
