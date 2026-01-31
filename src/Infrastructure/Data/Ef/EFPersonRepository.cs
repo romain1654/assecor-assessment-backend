@@ -13,6 +13,13 @@ public class EfPersonRepository : IPersonRepository
         _db = db;
     }
 
+    public async Task AddPersonAsync(Person person, CancellationToken token)
+    {
+        _db.Add(person);
+
+        await _db.SaveChangesAsync(token);
+    }
+
     public async Task<List<Person>> GetAllPeopleAsync(CancellationToken token)
     {
         return await _db.Persons

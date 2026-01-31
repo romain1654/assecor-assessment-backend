@@ -47,4 +47,9 @@ public class CsvPersonRepository : IPersonRepository
 
         return Task.FromResult(person);
     }
+
+    public Task AddPersonAsync(Person person, CancellationToken token)
+    {
+        throw new NotSupportedException("Der POST Endpunkt ist für die CSV Datenquelle nicht verfügbar. Bitte verwenden Sie die EF Datenquelle.");
+    }
 }
