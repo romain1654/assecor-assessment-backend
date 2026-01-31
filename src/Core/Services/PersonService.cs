@@ -17,6 +17,20 @@ public class PersonService : IPersonService
         _repo = repo;
     }
 
+    public async Task CreatePersonAsync(PersonCreateDto person, CancellationToken token)
+    {
+        var personColor = person.Color.ToLower();
+
+        if (!Enum.TryParse<Color>(personColor, out _))
+        {
+            Console.WriteLine($"Unknown color: '{personColor}' ");
+            
+            throw new UnknownColorException(personColor);
+        }
+
+       await _repo.AddPersonAsync(person.ToEntity(), token);
+    }
+
     public async Task<List<PersonReadDto>> GetAllPeopleAsync(CancellationToken token)
     {
         var persons = await _repo.GetAllPeopleAsync(token);
