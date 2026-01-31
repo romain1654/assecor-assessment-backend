@@ -42,6 +42,25 @@ public static class PersonEndpoints
                 });
             }
         });     
+
+        group.MapPost("/", async Task<IResult> (PersonCreateDto dto, IPersonService svc, CancellationToken token) => 
+        {
+            try
+            {
+                await svc.CreatePersonAsync(dto, token);
+
+                return TypedResults.Created();
+            }
+            
+            catch (UnknownColorException ex)
+            {
+                return TypedResults.BadRequest(new 
+                { 
+                    error = ex.Message 
+                });
+            }
+        });    
+        
         return group;
     }
 }
