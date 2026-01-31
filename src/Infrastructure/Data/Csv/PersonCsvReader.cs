@@ -1,7 +1,9 @@
 using System.Text;
 using Core.Entities;
 using Core.Exceptions;
+using Infrastructure.Options;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Infrastructure.Data.Csv;
 
@@ -10,10 +12,10 @@ public class PersonCsvReader
     private readonly string _csvPath;
     private readonly ILogger<PersonCsvReader> _logger;
 
-    public PersonCsvReader(ILogger<PersonCsvReader> logger, string path)
+    public PersonCsvReader(ILogger<PersonCsvReader> logger, IOptions<CsvOptions> options)
     {
         _logger = logger;
-        _csvPath = path;
+        _csvPath = options.Value.FilePath;
     }
 
     public List<Person> ReadCsv()

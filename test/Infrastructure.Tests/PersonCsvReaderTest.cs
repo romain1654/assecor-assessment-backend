@@ -1,21 +1,33 @@
 using Core.Exceptions;
 using Infrastructure.Data.Csv;
+using Infrastructure.Options;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 
 public class PersonCsvReaderTests
 {
-    private NullLogger<PersonCsvReader> _logger; 
+    private NullLogger<PersonCsvReader> _logger;     
 
     public PersonCsvReaderTests()
     {
         _logger = NullLogger<PersonCsvReader>.Instance;
     }
 
+    public IOptions<CsvOptions> CreateOptions(string fileName)
+    {
+        return Options.Create(new CsvOptions
+        {
+            FilePath = fileName
+        });       
+    }
+
     [Fact]
     public void ReadCsv_WhenFileDoesNotExist_ThrowsDataSourceUnavailableException()
     {
-        var path =  "non-existing-file.csv";
-        var reader = new PersonCsvReader(_logger, path);
+        var nonExistingFile = "non-existing-file.csv";
+        var options = CreateOptions(nonExistingFile);
+
+        var reader = new PersonCsvReader(_logger, options);
 
         Assert.Throws<DataSourceUnavailableException>(() => reader.ReadCsv());
     }
@@ -24,6 +36,7 @@ public class PersonCsvReaderTests
     public void ReadCsv_WhenAllLinesValid_ParsesPeopleCorrectly()
     {
         var tempFile = Path.GetTempFileName();
+        var options = CreateOptions(tempFile);
 
         try
         {
@@ -33,7 +46,7 @@ public class PersonCsvReaderTests
                 "Millenium, Milly, 10115!- made up too*, 4"
             });
 
-            var reader = new PersonCsvReader(_logger, tempFile);
+            var reader = new PersonCsvReader(_logger, options);
 
             var people = reader.ReadCsv();
 
@@ -64,6 +77,7 @@ public class PersonCsvReaderTests
     public void ReadCsv_WhenOneLineIsMalformed_SkipsThatLine()
     {
         var tempFile = Path.GetTempFileName();
+        var options = CreateOptions(tempFile);
 
         try
         {
@@ -75,7 +89,7 @@ public class PersonCsvReaderTests
                 "Millenium, Milly, 10115!- made up too*, 4"
             });
 
-            var reader = new PersonCsvReader(_logger, tempFile);
+            var reader = new PersonCsvReader(_logger, options);
 
             var people = reader.ReadCsv();
 
